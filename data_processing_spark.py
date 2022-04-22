@@ -29,12 +29,12 @@ def main(spark, netID):
     countsDF.createOrReplaceTempView('counts')
 
     # merge to create new DF that includes counts
-    to_split = spark.sql("SELECT r.userId, r.movieId, r.rating, r.timestamp, c.rating_counts FROM ratings r left join counts c on r.userId = c.userId WHERE c.rating_counts > 2") 
-    training_only = spark.sql("SELECT r.userId, r.movieId, r.rating, r.timestamp, c.rating_counts FROM ratings r left join counts c on r.userId = c.userId WHERE c.rating_counts < 3") 
+    to_split = spark.sql("SELECT r.userId, r.movieId, r.rating, r.timestamp, c.rating_counts FROM ratings r left join counts c on r.userId = c.userId WHERE c.rating_counts > 9") 
+    training_only = spark.sql("SELECT r.userId, r.movieId, r.rating, r.timestamp, c.rating_counts FROM ratings r left join counts c on r.userId = c.userId WHERE c.rating_counts < 10") 
 
     # save to csv files
-    to_split.coalesce(1).write.csv("full_tosplit.csv")
-    training_only.coalesce(1).write.csv("full_trainonly.csv")
+    to_split.coalesce(1).write.csv("full_tostratify.csv")
+    training_only.coalesce(1).write.csv("full_lessthan10.csv")
 
 
 
