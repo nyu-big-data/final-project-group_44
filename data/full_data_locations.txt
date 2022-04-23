@@ -1,0 +1,7 @@
+To access train, test, and validation data for full dataset:
+
+hdfs:/user/ck3419/pub/ratings_all_train.csv
+
+hdfs:/user/ck3419/pub/ratings_all_test.csv
+
+hdfs:/user/ck3419/pub/ratings_all_val.csv
