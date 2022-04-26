@@ -23,6 +23,10 @@ def main(spark, netID):
     '''
 
     # read in test data
+    # try with train data instead just for debugging
+    #test = spark.read.csv(f'hdfs:/user/{netID}/ratings_small_train.csv', header='true', schema='index INT, userId INT,movieId INT,rating DOUBLE,timestamp INT')
+
+
     test = spark.read.csv(f'hdfs:/user/{netID}/ratings_small_test.csv', header='true', schema='index INT, userId INT,movieId INT,rating DOUBLE,timestamp INT')
     #test.show()    
 
@@ -49,13 +53,13 @@ def main(spark, netID):
     #predictionAndLabels = combo.rdd.map(lambda row: (row['movieId'], row['ground_truth']))
 
 
-    #predictionAndLabels = combo.rdd.map(lambda row: (row['prediction'], row['ground_truth']))
-    #metrics = RankingMetrics(predictionAndLabels)
+    predictionAndLabels = combo.rdd.map(lambda row: (row['prediction'], row['ground_truth']))
+    metrics = RankingMetrics(predictionAndLabels)
     
-    #MAP = metrics.meanAveragePrecision
-    #print('MAP:',MAP) 
-    #precis = metrics.precisionAt(100)
-    #print("precis", precis)
+    MAP = metrics.meanAveragePrecision
+    print('MAP:',MAP) 
+    precis = metrics.precisionAt(100)
+    print("precis", precis)
 
 
 

@@ -23,8 +23,14 @@ def main(spark, netID):
     # make temporary view
     train.createOrReplaceTempView('train')
 
+    # drop movies with 4 or less reviews
+    train = spark.sql('SELECT *, COUNT(userId) OVER (PARTITION BY movieID) as num_ratings FROM train')
+    train.createOrReplaceTempView('train')
+
+
     # get top 100 most popular movies
-    top100 = spark.sql("SELECT movieId FROM train GROUP BY movieId ORDER BY avg(rating) DESC LIMIT 100")
+    top100 = spark.sql("SELECT movieId FROM train WHERE num_ratings > 4 GROUP BY movieId ORDER BY avg(rating) DESC LIMIT 100")
+    #top100 = spark.sql("SELECT movieId FROM train GROUP BY movieId ORDER BY avg(rating) DESC LIMIT 100")
 
     top100.show()
 
