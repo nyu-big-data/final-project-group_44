@@ -24,11 +24,11 @@ def main(spark, netID):
     train.createOrReplaceTempView('train')
 
     # get top 100 most popular movies
-    top100 = spark.sql("SELECT movieId, avg(rating) as avgRating FROM train GROUP BY movieId ORDER BY avgRating DESC LIMIT 100")
+    top100 = spark.sql("SELECT movieId FROM train GROUP BY movieId ORDER BY avg(rating) DESC LIMIT 100")
 
     top100.show()
 
-
+    top100.coalesce(1).write.csv("top100_pop_small.csv")
 
 # Only enter this block if we're in main
 if __name__ == "__main__":
