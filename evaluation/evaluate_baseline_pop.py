@@ -35,7 +35,9 @@ def main(spark, netID):
 
 
     # read in popularity predictions
-    top100 = spark.read.csv(f'hdfs:/user/{netID}/top100_pop_small.csv', header='false', schema='movieId INT')
+    #top100 = spark.read.csv(f'hdfs:/user/{netID}/top100_pop_small.csv', header='false', schema='movieId INT')
+    top100 = spark.read.csv(f'hdfs:/user/{netID}/top100_pop_full.csv', header='false', schema='movieId INT')
+
 
     # convert to numpy array
     top100_pd = top100.toPandas()

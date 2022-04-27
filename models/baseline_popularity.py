@@ -18,8 +18,8 @@ def main(spark, netID):
     '''
 
     # Read in training data
-    train = spark.read.csv(f'hdfs:/user/{netID}/ratings_small_train.csv', header='true', schema='index INT, userId INT,movieId INT,rating DOUBLE,timestamp INT')
-    
+    #train = spark.read.csv(f'hdfs:/user/{netID}/ratings_small_train.csv', header='true', schema='index INT, userId INT,movieId INT,rating DOUBLE,timestamp INT')
+    train = spark.read.csv(f'hdfs:/user/ck3419/pub/ratings_all_train.csv', header='true', schema='index INT, userId INT,movieId INT,rating DOUBLE,timestamp INT')
     # make temporary view
     train.createOrReplaceTempView('train')
 
@@ -34,7 +34,8 @@ def main(spark, netID):
 
     top100.show()
 
-    top100.coalesce(1).write.csv("top100_pop_small.csv")
+    #top100.coalesce(1).write.csv("top100_pop_small.csv")
+    top100.coalesce(1).write.csv("top100_pop_full.csv")
 
 # Only enter this block if we're in main
 if __name__ == "__main__":
