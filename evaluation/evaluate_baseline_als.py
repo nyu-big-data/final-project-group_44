@@ -7,6 +7,7 @@ import getpass
 from pyspark.ml.recommendation import ALS, ALSModel
 from pyspark.mllib.evaluation import RankingMetrics
 import numpy as np 
+from pyspark.sql.functions import *
 # And pyspark.sql to get the spark session
 from pyspark.sql import SparkSession
 
@@ -34,11 +35,11 @@ def main(spark, netID):
     ground_truth_test = test.groupBy('userId').agg(collect_set('movieId').alias('ground_truth')).repartition('userId')
     
     # get predictions for each user
-    predictions = model.recommendForUserSubset(yest_users, 100).select('userId', 'movieId').repartition("userId")
+    predictions = model.recommendForUserSubset(test_users, 100).select('userId', 'recommendations.movieId').repartition("userId")
     
     combo = predictions.join(broadcast(ground_truth_test), on = 'userId', how = 'inner')
 
-    predictionAndLabels = combo.rdd.map(lambda row: (row['prediction'], row['ground_truth']))
+    predictionAndLabels = combo.rdd.map(lambda row: (row['movieId'], row['ground_truth']))
 
     # Metrics
     metrics = RankingMetrics(predictionAndLabels)
