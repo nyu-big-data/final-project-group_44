@@ -10,7 +10,7 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import *
 import numpy as np
 import pandas as pd
-#from pyspark.mllib.evaluation import RankingMetrics 
+from pyspark.mllib.evaluation import RankingMetrics 
 from pyspark.ml.evaluation import RegressionEvaluator
 
 
@@ -44,7 +44,7 @@ def main(spark, netID):
     print(top100_arr)
 
     test_users = test.select('userId').distinct()    
-    predictions = test_users.withColumn('prediction', array([lit(i) for i in top100_arr.to_list()]))    
+    predictions = test_users.withColumn('prediction', array([lit(i) for i in top100_arr.tolist()]))    
    # predictions = test_users.withColumn('prediction', top100_arr)     
     
     #predictions.show()
@@ -67,13 +67,6 @@ def main(spark, netID):
     precis = metrics.precisionAt(100)
     print("precis", precis)
 
-
-    evaluator = RegressionEvaluator()
-    evaluator.setPredictionCol("prediction")
-
-    predictions_df = combo.drop('userId')
-    print('evaluate:', evaluator.evaluate(predictions_df))
-    print('MSE:', evaluator.evaluate(dataset, {evaluator.metricName: "mse"}))
 
 
 
