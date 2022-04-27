@@ -11,6 +11,12 @@
 
 
 ### Full
+| Metric Name    | Value |
+| ----------- | ----------- |
+| MAP         | 0.001499  |
+| MAP at k = 100 | 0.00227        |
+| NDCG at k = 100 | 0.01173     |
+
 
 ## Baseline ALS
 ### Small
