@@ -10,8 +10,8 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import *
 import numpy as np
 import pandas as pd
-from pyspark.mllib.evaluation import RankingMetrics 
-
+#from pyspark.mllib.evaluation import RankingMetrics 
+from pyspark.ml.evaluation import RegressionEvaluator
 
 
 def main(spark, netID):
@@ -35,31 +35,45 @@ def main(spark, netID):
 
 
     # read in popularity predictions
-    top100 = spark.read.csv(f'hdfs:/user/{netID}/top100_pop_small.csv')
+    top100 = spark.read.csv(f'hdfs:/user/{netID}/top100_pop_small.csv', header='false', schema='movieId INT')
+
     # convert to numpy array
     top100_pd = top100.toPandas()
     top100_arr = top100_pd.to_numpy().flatten()
-
+    #top100_arr = top100_pd.to_numpy()
+    print(top100_arr)
 
     test_users = test.select('userId').distinct()    
-    predictions = test_users.withColumn('prediction', array([lit(i) for i in top100_arr]))    
-
+    predictions = test_users.withColumn('prediction', array([lit(i) for i in top100_arr.to_list()]))    
+   # predictions = test_users.withColumn('prediction', top100_arr)     
+    
     #predictions.show()
 
     combo = predictions.join(broadcast(ground_truth_test), on = 'userId', how = 'inner')
-    combo.show()
+    #combo.show()
 
 
     #predictionAndLabels = combo.rdd.map(lambda row: (row['movieId'], row['ground_truth']))
 
 
     predictionAndLabels = combo.rdd.map(lambda row: (row['prediction'], row['ground_truth']))
-    metrics = RankingMetrics(predictionAndLabels)
     
+    #print(predictionAndLabels.take(3))
+
+    metrics = RankingMetrics(predictionAndLabels)
+
     MAP = metrics.meanAveragePrecision
     print('MAP:',MAP) 
     precis = metrics.precisionAt(100)
     print("precis", precis)
+
+
+    evaluator = RegressionEvaluator()
+    evaluator.setPredictionCol("prediction")
+
+    predictions_df = combo.drop('userId')
+    print('evaluate:', evaluator.evaluate(predictions_df))
+    print('MSE:', evaluator.evaluate(dataset, {evaluator.metricName: "mse"}))
 
 
 
