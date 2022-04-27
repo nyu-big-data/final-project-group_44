@@ -66,7 +66,8 @@ def main(spark, netID):
     print('MAP:',MAP) 
     precis = metrics.precisionAt(100)
     print("precis", precis)
-
+    NDCG = metrics.ndcgAt(100)
+    print("NDCG", NDCG)
 
 
 
