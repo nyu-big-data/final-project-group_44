@@ -25,7 +25,7 @@ def main(spark, netID):
     train = spark.read.csv(f'hdfs:/user/{netID}/ratings_small_train.csv', header='true', schema='index INT, userId INT,movieId INT,rating DOUBLE,timestamp INT')
     
 
-    ranks = [40, 50, 60, 70, 100]
+    ranks = [60]
     regs = [0.01, 0.1, 1, 10]
 
     for rank in ranks:
@@ -34,7 +34,7 @@ def main(spark, netID):
                         nonnegative = True, implicitPrefs = True, coldStartStrategy="drop", seed=42)
 
             model = als.fit(train) 
-            model.write().overwrite().save(f"hdfs:/user/ck3419/ALS_model_small_rank{rank}_reg{reg}")
+            model.write().overwrite().save(f"hdfs:/user/ya2193/ALS_model_small_rank{rank}_reg{reg}")
            
 
 
