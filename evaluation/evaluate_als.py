@@ -21,7 +21,7 @@ def main(spark, netID):
 	netID : string, netID of student to find files in HDFS
 	'''
 	#rank = [30, 40, 50, 60]
-	rank = [30]
+	rank =[60]
 	regParam = [0.01, 0.1, 1, 10]
    
 	for r in rank:

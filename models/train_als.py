@@ -25,7 +25,7 @@ def main(spark, netID):
     train = spark.read.csv(f'hdfs:/user/{netID}/ratings_small_train.csv', header='true', schema='index INT, userId INT,movieId INT,rating DOUBLE,timestamp INT')
     
 
-    ranks = [60]
+    ranks = [40]
     regs = [0.01, 0.1, 1, 10]
 
     for rank in ranks:
