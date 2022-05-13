@@ -1,0 +1,5 @@
+test metrics on full set:
+Metrics for rank30 and regParam0.1 on full dataset
+MAP: 0.05560414942743543
+precis: 0.027067825781909475
+NDCG: 0.1758709153919211
