@@ -1,0 +1,46 @@
+'''Starter Pyspark Script for students to complete for their Lab 3 Assignment.
+Usage:
+    $ spark-submit lab_3_starter_code.py <student_netID>
+'''
+#Use getpass to obtain user netID
+import getpass
+
+# And pyspark.sql to get the spark session
+from pyspark.sql import SparkSession
+from pyspark.ml.recommendation import ALS, ALSModel
+import numpy as np
+from pyspark.sql.functions import *
+from pyspark.ml.evaluation import RegressionEvaluator
+from pyspark.mllib.evaluation import RankingMetrics
+from lightfm import LightFM
+from lightfm.evaluation import precision_at_k
+
+def main(spark, netID):
+    '''Main routine for Lab Solutions
+    Parameters
+    ----------
+    spark : SparkSession object
+    netID : string, netID of student to find files in HDFS
+    '''
+
+     # Read in training data
+    train = spark.read.csv(f'hdfs:/user/{netID}/ratings_small_train.csv', header='true', schema='index INT, userId INT,movieId INT,rating DOUBLE,timestamp INT')
+    
+    model = LightFM(loss='warp')
+    %time model.fit(data['train'], epochs=30, num_threads=2)
+    print("Train precision: %.2f" % precision_at_k(model, data['train'], k=5).mean())
+    print("Test precision: %.2f" % precision_at_k(model, data['test'], k=5).mean())   
+
+
+
+# Only enter this block if we're in main
+if __name__ == "__main__":
+
+    # Create the spark session object
+    spark = SparkSession.builder.appName('part1').getOrCreate()
+
+    # Get user netID from the command line
+    netID = getpass.getuser()
+
+    # Call our main routine
+    main(spark, netID)
