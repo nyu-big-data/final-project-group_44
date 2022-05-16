@@ -67,7 +67,8 @@ def main(spark, netID):
 	# load best model
 	model = ALSModel.load(f"hdfs:/user/{netID}/ALS_model_small_rank30_reg0.1")
 	# load test data
-	test = spark.read.csv(f'hdfs:/user/{netID}/ratings_small_test.csv', header='true', schema='index INT, userId INT,movieId INT,rating DOUBLE,timestamp INT')
+	test = spark.read.csv(f'hdfs:/user/{netID}/pub/ratings_all_test.csv', header='true', schema='index INT, userId INT,movieId INT,rating DOUBLE,timestamp INT')
+	#test = spark.read.csv(f'hdfs:/user/{netID}/ratings_small_test.csv', header='true', schema='index INT, userId INT,movieId INT,rating DOUBLE,timestamp INT')
 	# get ground truth for each user
 	test_users = test.select('userId').distinct()
 	ground_truth_test = test.groupBy('userId').agg(collect_set('movieId').alias('ground_truth')).repartition('userId')
@@ -92,21 +93,16 @@ def main(spark, netID):
 
 	# explode ground_truth column to get relevant movies
 	low_user_movies = low_users.select(low_users.userId, explode(low_users.ground_truth).alias('movieId'))
-	#low_user_movies.show(5)
 	
 	# read in movie data
-	movies = spark.read.csv(f'hdfs:/user/{netID}/movies_small.csv', header='true', schema='movieId INT, title STRING ,genres STRING')
+	movies = spark.read.csv(f'hdfs:/user/{netID}/movies_all.csv', header='true', schema='movieId INT, title STRING ,genres STRING')
+	#movies = spark.read.csv(f'hdfs:/user/{netID}/movies_small.csv', header='true', schema='movieId INT, title STRING ,genres STRING')
 
 	# get movies for these users with high error in predictions
 	genres = low_user_movies.join(movies, on='movieId', how='left').select('userId', 'movieId', 'genres')
-	genres.write.csv('error_genres_small.csv')
+	genres.write.csv('error_genres_all.csv')
+	#genres.write.csv('error_genres_small.csv')
 	
-	"""
-	genres_split = genres.select('userId', 'movieId', split(genres.genres, '\|').alias('genres_arr')).drop('genres')
-
-	# save to csv
-	genres_split.write.csv('error_genres_small.csv')
-	"""
 
 
 # Only enter this block if we're in main
