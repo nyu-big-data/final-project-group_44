@@ -16,6 +16,7 @@ from pyspark.sql.functions import *
 from pyspark.ml.evaluation import RegressionEvaluator
 from pyspark.mllib.evaluation import RankingMetrics
 from pyspark.sql.types import FloatType
+from pyspark.sql.window import Window
 
 
 def apk(predicted, actual, k=100):
@@ -76,17 +77,36 @@ def main(spark, netID):
 
 	combo = predictions.join(broadcast(ground_truth_test), on = 'userId', how = 'inner')
 
-	predictAndTruth = combo.select('movieId', 'ground_truth')
+	predictAndTruth = combo.select('userId','movieId', 'ground_truth')
 
 	# create udf of our AP function
 	ap_udf = udf(apk, FloatType())
 
-
 	map_vals = predictAndTruth.withColumn('AP', ap_udf('movieId', 'ground_truth'))
 
-	map_vals.show()
+	# Get percentiles
+	percentiles = map_vals.select("userId",'ground_truth', 'AP',percent_rank().over(Window.partitionBy().orderBy(map_vals['AP'])).alias("percentile"))
 
+	# get users with 10 percentile or less
+	low_users = percentiles.filter('percentile <= 0.2').select('userId', 'ground_truth')
 
+	# explode ground_truth column to get relevant movies
+	low_user_movies = low_users.select(low_users.userId, explode(low_users.ground_truth).alias('movieId'))
+	#low_user_movies.show(5)
+	
+	# read in movie data
+	movies = spark.read.csv(f'hdfs:/user/{netID}/movies_small.csv', header='true', schema='movieId INT, title STRING ,genres STRING')
+
+	# get movies for these users with high error in predictions
+	genres = low_user_movies.join(movies, on='movieId', how='left').select('userId', 'movieId', 'genres')
+	genres.write.csv('error_genres_small.csv')
+	
+	"""
+	genres_split = genres.select('userId', 'movieId', split(genres.genres, '\|').alias('genres_arr')).drop('genres')
+
+	# save to csv
+	genres_split.write.csv('error_genres_small.csv')
+	"""
 
 
 # Only enter this block if we're in main
