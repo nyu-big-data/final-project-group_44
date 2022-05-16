@@ -4,10 +4,11 @@ from lenskit import batch, topn, util
 from lenskit import crossfold as xf
 from lenskit.algorithms import Recommender, als, item_knn as knn
 from lenskit import topn
+import time
 
-train = pd.read_csv('/Users/jennaelizabethellis/Desktop/NYU/bigdata/finalproject/final-project-group_44/data/ratings_small_train.csv',)
+train = pd.read_csv('hdfs:/user/ck3419/pub/ratings_all_train.csv',)
 train = train.drop(columns='Unnamed: 0')
-test = pd.read_csv('/Users/jennaelizabethellis/Desktop/NYU/bigdata/finalproject/final-project-group_44/data/ratings_small_test.csv',)
+test = pd.read_csv('hdfs:/user/{netID}/pub/ratings_all_test.csv',)
 test = test.drop(columns='Unnamed: 0')
 
 train = train.rename(columns={"userId": "user", "movieId": "item"})
@@ -19,7 +20,10 @@ algo_als = als.BiasedMF(50)
 def eval(aname, algo, train, test):
     fittable = util.clone(algo)
     fittable = Recommender.adapt(fittable)
+    start_time = time.time()
     fittable.fit(train)
+    stop_time = time.time()
+    print('train time for', aname, ':', stop_time - start_time)
     users = test.user.unique()
     # now we run the recommender
     recs = batch.recommend(fittable, users, 100)
