@@ -1,7 +1,10 @@
 '''Starter Pyspark Script for students to complete for their Lab 3 Assignment.
 Usage:
     $ spark-submit lab_3_starter_code.py <student_netID>
+
+Note: apk function based off of https://github.com/benhamner/Metrics/blob/master/Python/ml_metrics/average_precision.py
 '''
+
 #Use getpass to obtain user netID
 import getpass
 import builtins
