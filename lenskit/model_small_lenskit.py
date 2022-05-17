@@ -6,9 +6,9 @@ from lenskit.algorithms import Recommender, als, item_knn as knn
 from lenskit import topn
 import time
 
-train = pd.read_csv('hdfs:/user/ck3419/pub/ratings_all_train.csv',)
+train = pd.read_csv('ratings_all_train.csv',)
 train = train.drop(columns='Unnamed: 0')
-test = pd.read_csv('hdfs:/user/{netID}/pub/ratings_all_test.csv',)
+test = pd.read_csv('ratings_all_test.csv',)
 test = test.drop(columns='Unnamed: 0')
 
 train = train.rename(columns={"userId": "user", "movieId": "item"})
