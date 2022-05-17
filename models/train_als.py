@@ -4,6 +4,7 @@ Usage:
 '''
 #Use getpass to obtain user netID
 import getpass
+import time
 
 # And pyspark.sql to get the spark session
 from pyspark.sql import SparkSession
@@ -25,17 +26,19 @@ def main(spark, netID):
     train = spark.read.csv(f'hdfs:/user/{netID}/ratings_small_train.csv', header='true', schema='index INT, userId INT,movieId INT,rating DOUBLE,timestamp INT')
     
 
-    ranks = [40]
-    regs = [0.01, 0.1, 1, 10]
+    ranks = [30]
+    regs = [0.1]
 
     for rank in ranks:
         for reg in regs:
             als = ALS(rank = rank, maxIter=20, regParam=reg, userCol="userId", itemCol="movieId", ratingCol="rating",\
                         nonnegative = True, implicitPrefs = True, coldStartStrategy="drop", seed=42)
 
+            start = time.time()
             model = als.fit(train) 
-            model.write().overwrite().save(f"hdfs:/user/ya2193/ALS_model_small_rank{rank}_reg{reg}")
-           
+            stop = time.time()
+            model.write().overwrite().save(f"hdfs:/user/{netID}/ALS_model_small_rank{rank}_reg{reg}")
+            print('time to run spark als on small set:', stop - start)
 
 
 
