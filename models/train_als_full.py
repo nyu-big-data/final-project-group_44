@@ -4,6 +4,7 @@ Usage:
 '''
 #Use getpass to obtain user netID
 import getpass
+import time
 
 # And pyspark.sql to get the spark session
 from pyspark.sql import SparkSession
@@ -24,10 +25,13 @@ def main(spark, netID):
 
     als = ALS(rank = 30, maxIter=20, regParam=0.1, userCol="userId", itemCol="movieId", ratingCol="rating",\
                         nonnegative = True, implicitPrefs = True, coldStartStrategy="drop", seed=42)
-
+    start = time.time()
     model = als.fit(train)
+    stop = time.time()
     model.write().overwrite().save(f"hdfs:/user/{netID}/ALS_model_full_rank30_reg0.1")
 
+    # print time
+    print('total time for als on full set:', stop - start)
 
 
 

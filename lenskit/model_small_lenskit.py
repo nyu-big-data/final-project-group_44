@@ -32,8 +32,8 @@ def eval(aname, algo, train, test):
     return recs
 
 all_recs = []
-all_recs.append(eval('ItemItem', algo_ii, train, test))
 all_recs.append(eval('ALS', algo_als, train, test))
+all_recs.append(eval('ItemItem', algo_ii, train, test))
 
 test_data = []
 test_data.append(test)
