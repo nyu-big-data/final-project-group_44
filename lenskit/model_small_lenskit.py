@@ -12,9 +12,9 @@ import os
 #os.environ['NUMBA_NUM_THREADS'] = '1'
 
 
-train = pd.read_csv('ratings_all_train.csv',)
+train = pd.read_csv('../data/ratings_small_train.csv',)
 train = train.drop(columns='Unnamed: 0')
-test = pd.read_csv('ratings_all_test.csv',)
+test = pd.read_csv('../data/ratings_small_test.csv',)
 test = test.drop(columns='Unnamed: 0')
 
 train = train.rename(columns={"userId": "user", "movieId": "item"})
