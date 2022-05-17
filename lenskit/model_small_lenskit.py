@@ -5,6 +5,12 @@ from lenskit import crossfold as xf
 from lenskit.algorithms import Recommender, als, item_knn as knn
 from lenskit import topn
 import time
+import os
+
+# set env variable
+#os.environ['MKL_NUM_THREADS'] = '1'
+#os.environ['NUMBA_NUM_THREADS'] = '1'
+
 
 train = pd.read_csv('ratings_all_train.csv',)
 train = train.drop(columns='Unnamed: 0')
@@ -14,7 +20,7 @@ test = test.drop(columns='Unnamed: 0')
 train = train.rename(columns={"userId": "user", "movieId": "item"})
 test = test.rename(columns={"userId": "user", "movieId": "item"})
 
-algo_ii = knn.ItemItem(20)
+#algo_ii = knn.ItemItem(20)
 algo_als = als.BiasedMF(50)
 
 def eval(aname, algo, train, test):
@@ -33,7 +39,7 @@ def eval(aname, algo, train, test):
 
 all_recs = []
 all_recs.append(eval('ALS', algo_als, train, test))
-all_recs.append(eval('ItemItem', algo_ii, train, test))
+#all_recs.append(eval('ItemItem', algo_ii, train, test))
 
 test_data = []
 test_data.append(test)
